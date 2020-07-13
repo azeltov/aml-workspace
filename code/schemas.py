@@ -39,10 +39,6 @@ parameters_schema = {
             "minLength": 2,
             "maxLength": 32
         },
-        "resource_group": {
-            "type": "string",
-            "description": "The Azure resource group that contains the workspace."
-        },
         "create_workspace": {
             "type": "boolean",
             "description": "Indicates whether to create the workspace if it doesn't exist."

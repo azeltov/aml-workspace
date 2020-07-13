@@ -15,7 +15,6 @@ def test_validate_json_valid_inputs():
     """
     json_object = {
         "name": "workspace-name",
-        "resource_group": "resource-group-name",
         "create_workspace": False,
         "friendly_name": "friendly-name",
         "create_resource_group": True,

@@ -15,6 +15,8 @@ def main():
     # Loading azure credentials
     print("::debug::Loading azure credentials")
     azure_credentials = os.environ.get("INPUT_AZURE_CREDENTIALS", default="{}")
+    resource_group = os.environ.get("INPUT_RESOURCE_GROUP", default=None)
+
     try:
         azure_credentials = json.loads(azure_credentials)
     except JSONDecodeError:
@@ -28,6 +30,12 @@ def main():
         schema=azure_credentials_schema,
         input_name="AZURE_CREDENTIALS"
     )
+
+    # Default workspace and resource group name
+    repository_name = str(os.environ.get("GITHUB_REPOSITORY")).split("/")[-1]
+
+    if not resource_group:
+        resource_group = repository_name
 
     # Mask values
     print("::debug::Masking parameters")
@@ -72,13 +80,11 @@ def main():
     )
     try:
         print("::debug::Loading existing Workspace")
-        # Default workspace and resource group name
-        repository_name = str(os.environ.get("GITHUB_REPOSITORY")).split("/")[-1]
 
         ws = Workspace.get(
             name=parameters.get("name", repository_name),
             subscription_id=azure_credentials.get("subscriptionId", ""),
-            resource_group=parameters.get("resource_group", repository_name),
+            resource_group=resource_group,
             auth=sp_auth
         )
         print("::debug::Successfully loaded existing Workspace")
@@ -99,7 +105,7 @@ def main():
                 ws = Workspace.create(
                     name=parameters.get("name", repository_name),
                     subscription_id=azure_credentials.get("subscriptionId", ""),
-                    resource_group=parameters.get("resource_group", repository_name),
+                    resource_group=resource_group,
                     location=parameters.get("location", None),
                     create_resource_group=parameters.get("create_resource_group", True),
                     sku=parameters.get("sku", "basic"),

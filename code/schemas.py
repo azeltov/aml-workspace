@@ -31,7 +31,7 @@ parameters_schema = {
     "title": "aml-workspace",
     "description": "JSON specification for your workspace details",
     "type": "object",
-    "required": ["name", "resource_group"],
+    "required": ["name"],
     "properties": {
         "name": {
             "type": "string",

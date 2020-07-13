@@ -17,6 +17,7 @@ jobs:
         with:
           azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
           parameters_file: "test/test_workspace.json"
+          resource_group: "gha_and_aml_rg"
 
       # connect to above created workspace
       - name: Connect Workspace

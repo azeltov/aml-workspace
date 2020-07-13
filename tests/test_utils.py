@@ -41,8 +41,7 @@ def test_validate_json_incorrect_field():
     Unit test to check if field incorrect
     """
     json_object = {
-        "name": "workspace-name",
-        "resour_group": "resource-group-name",
+        "name": "workspace-name"
     }
     with pytest.raises(AMLConfigurationException):
         assert validate_json(

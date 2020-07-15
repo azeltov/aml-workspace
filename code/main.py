@@ -16,6 +16,7 @@ def main():
     print("::debug::Loading azure credentials")
     azure_credentials = os.environ.get("INPUT_AZURE_CREDENTIALS", default="{}")
     resource_group = os.environ.get("INPUT_RESOURCE_GROUP", default=None)
+    workspace_name = os.environ.get("INPUT_WORKSPACE_NAME", default=None)
 
     try:
         azure_credentials = json.loads(azure_credentials)
@@ -30,12 +31,6 @@ def main():
         schema=azure_credentials_schema,
         input_name="AZURE_CREDENTIALS"
     )
-
-    # Default workspace and resource group name
-    repository_name = str(os.environ.get("GITHUB_REPOSITORY")).split("/")[-1]
-
-    if not resource_group:
-        resource_group = repository_name
 
     # Mask values
     print("::debug::Masking parameters")
@@ -63,6 +58,15 @@ def main():
         input_name="PARAMETERS_FILE"
     )
 
+    # Default workspace and resource group name
+    repository_name = str(os.environ.get("GITHUB_REPOSITORY")).split("/")[-1]
+
+    if not resource_group:
+        resource_group = parameters.get("resource_group", repository_name)
+    
+    if not workspace_name:
+        workspace_name = parameters.get("name", repository_name)
+
     # Define target cloud
     if azure_credentials.get("resourceManagerEndpointUrl", "").startswith("https://management.usgovcloudapi.net"):
         cloud = "AzureUSGovernment"
@@ -82,7 +86,7 @@ def main():
         print("::debug::Loading existing Workspace")
 
         ws = Workspace.get(
-            name=parameters.get("name", repository_name),
+            name=workspace_name,
             subscription_id=azure_credentials.get("subscriptionId", ""),
             resource_group=resource_group,
             auth=sp_auth
@@ -103,7 +107,7 @@ def main():
             try:
                 print("::debug::Creating new Workspace")
                 ws = Workspace.create(
-                    name=parameters.get("name", repository_name),
+                    name=workspace_name,
                     subscription_id=azure_credentials.get("subscriptionId", ""),
                     resource_group=resource_group,
                     location=parameters.get("location", None),
